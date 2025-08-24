@@ -2,6 +2,8 @@
 
 🚀 A powerful CLI tool to scaffold modern frontend and backend projects with the latest tools and best practices.
 
+🔗 **GitHub Repository**: [pradeep-kalyan/launchr](https://github.com/pradeep-kalyan/launchr)
+
 ## Features
 
 - ⚛️ **Frontend Frameworks**: React, Next.js, Vue.js, Angular with TypeScript support
