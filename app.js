@@ -293,7 +293,7 @@ export default defineConfig({
           "--no-tailwind", // We'll add Tailwind v4 manually
           "--eslint",
           "--app",
-          "--src-dir",
+          "--no-src-dir",
           "--import-alias",
           "@/*",
           "--yes",
