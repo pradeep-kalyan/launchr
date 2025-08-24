@@ -6,7 +6,7 @@
 
 ## Features
 
-- ⚛️ **Frontend Frameworks**: React, Next.js, Vue.js, Angular with TypeScript support
+- ⚛️ **Frontend Frameworks**: React, Next.js, Vue.js with TypeScript support
 - 🎨 **Styling**: Tailwind CSS v4 integration
 - 🌐 **Backend Frameworks**: Express.js, Hapi.js, Koa with TypeScript support
 - 🗄️ **Databases**: MongoDB, PostgreSQL, MySQL, SQLite
@@ -46,7 +46,6 @@ Choose from various modern frontend frameworks:
 - Next.js + Tailwind CSS
 - Next.js + TypeScript + Tailwind CSS
 - Vue.js + Tailwind CSS
-- Angular + Tailwind CSS
 
 ### Backend Only
 

@@ -211,52 +211,69 @@ export default defineConfig({
 
     // Next.js + Tailwind (Next.js 14+ with Tailwind v4)
     if (frontendOptions.framework === "Next.js + Tailwind") {
+      // 1. Create your Next.js project with Turbo and all options
       await runCommand(
         "npx",
         [
           "create-next-app@latest",
           ".",
           "--js",
-          "--no-tailwind", // We'll add Tailwind v4 manually
+          "--no-tailwind", // We'll add v4 manually
           "--eslint",
           "--app",
           "--no-src-dir",
           "--import-alias",
           "@/*",
+          "--turbo",
+          "--yes",
         ],
         frontendDir,
-        "Setting up Next.js project"
+        "Setting up Next.js project with Turbo"
       );
 
-      // Install Tailwind v4 for Next.js
+      // 2. Install Tailwind CSS v4, PostCSS, and the Tailwind PostCSS plugin
       await runCommand(
         "npm",
-        ["install", "-D", "tailwindcss"],
+        ["install", "-D", "tailwindcss@4", "@tailwindcss/postcss", "postcss"],
         frontendDir,
-        "Installing Tailwind CSS v4"
+        "Installing Tailwind CSS v4 and PostCSS"
       );
 
-      // Update next.config.js for Tailwind v4
-      const nextConfigContent = `/** @type {import('next').NextConfig} */
-const nextConfig = {
-  experimental: {
-    optimizePackageImports: ['@tailwindcss/ui']
-  }
-}
-
-module.exports = nextConfig`;
-
+      // 3. Create postcss.config.mjs for Tailwind v4
+      const postcssConfigContent = `export default {
+  plugins: {
+    '@tailwindcss/postcss': {},
+  },
+};`;
       fs.writeFileSync(
-        path.join(frontendDir, "next.config.js"),
-        nextConfigContent,
+        path.join(frontendDir, "postcss.config.mjs"),
+        postcssConfigContent,
         "utf-8"
       );
 
-      // Update globals.css
+      // 4. Create tailwind.config.js
+      const tailwindConfigContent = `module.exports = {
+  content: [
+    "./app/**/*.{js,ts,jsx,tsx}",
+    "./components/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+};
+`;
+      fs.writeFileSync(
+        path.join(frontendDir, "tailwind.config.js"),
+        tailwindConfigContent,
+        "utf-8"
+      );
+
+      // 5. Update globals.css
       const cssContent = `@import "tailwindcss";
 
-/* Your custom styles here */`;
-
+/* Your custom styles here */
+`;
       fs.writeFileSync(
         path.join(frontendDir, "app", "globals.css"),
         cssContent,
@@ -266,6 +283,7 @@ module.exports = nextConfig`;
 
     // Next.js TS + Tailwind
     if (frontendOptions.framework === "Next.js TS + Tailwind") {
+      // 1. Create Next.js project with TypeScript and src dir
       await runCommand(
         "npx",
         [
@@ -278,19 +296,61 @@ module.exports = nextConfig`;
           "--src-dir",
           "--import-alias",
           "@/*",
+          "--yes",
         ],
         frontendDir,
         "Setting up Next.js with TypeScript"
       );
 
+      // 2. Install Tailwind v4, PostCSS, and @tailwindcss/postcss plugin
       await runCommand(
         "npm",
-        ["install", "-D", "tailwindcss"],
+        ["install", "-D", "tailwindcss@4", "postcss", "@tailwindcss/postcss"],
         frontendDir,
-        "Installing Tailwind CSS v4"
+        "Installing Tailwind CSS v4 and PostCSS"
       );
 
-      // Update next.config.ts
+      // 3. Create postcss.config.mjs
+      const postcssConfigContent = `export default {
+  plugins: {
+    '@tailwindcss/postcss': {},
+  },
+};`;
+      fs.writeFileSync(
+        path.join(frontendDir, "postcss.config.mjs"),
+        postcssConfigContent,
+        "utf-8"
+      );
+
+      // 4. Create tailwind.config.js
+      const tailwindConfigContent = `module.exports = {
+  content: [
+    "./src/app/**/*.{ts,tsx}",
+    "./src/components/**/*.{ts,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+};
+`;
+      fs.writeFileSync(
+        path.join(frontendDir, "tailwind.config.js"),
+        tailwindConfigContent,
+        "utf-8"
+      );
+
+      // 5. Update globals.css in src/app
+      const cssContent = `@import "tailwindcss";
+
+/* Your custom styles here */`;
+      fs.writeFileSync(
+        path.join(frontendDir, "src", "app", "globals.css"),
+        cssContent,
+        "utf-8"
+      );
+
+      // 6. Optional: Update next.config.ts for Tailwind optimization
       const nextConfigContent = `import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
@@ -300,21 +360,9 @@ const nextConfig: NextConfig = {
 }
 
 export default nextConfig`;
-
       fs.writeFileSync(
         path.join(frontendDir, "next.config.ts"),
         nextConfigContent,
-        "utf-8"
-      );
-
-      // Update globals.css in src/app
-      const cssContent = `@import "tailwindcss";
-
-/* Your custom styles here */`;
-
-      fs.writeFileSync(
-        path.join(frontendDir, "src", "app", "globals.css"),
-        cssContent,
         "utf-8"
       );
     }
@@ -360,71 +408,6 @@ export default defineConfig({
         cssContent,
         "utf-8"
       );
-    }
-
-    // Angular with Tailwind v4
-    if (frontendOptions.framework === "Angular") {
-      await runCommand(
-        "npx",
-        [
-          "-p",
-          "@angular/cli@latest",
-          "ng",
-          "new",
-          ".",
-          "--routing",
-          "--style=css",
-          "--skip-git",
-        ],
-        frontendDir,
-        "Setting up Angular project"
-      );
-
-      // Install Tailwind v4 for Angular
-      await runCommand(
-        "npm",
-        ["install", "-D", "tailwindcss"],
-        frontendDir,
-        "Installing Tailwind CSS v4"
-      );
-
-      // Update angular.json to include Tailwind build process
-      const angularJsonPath = path.join(frontendDir, "angular.json");
-      if (fs.existsSync(angularJsonPath)) {
-        const angularJson = JSON.parse(
-          fs.readFileSync(angularJsonPath, "utf-8")
-        );
-
-        // Add Tailwind to build options if not present
-        if (
-          angularJson.projects &&
-          angularJson.projects[Object.keys(angularJson.projects)[0]]
-        ) {
-          const projectName = Object.keys(angularJson.projects)[0];
-          const buildOptions =
-            angularJson.projects[projectName].architect.build.options;
-
-          if (
-            !buildOptions.styles.some((style) => style.includes("tailwindcss"))
-          ) {
-            buildOptions.styles.unshift("@tailwindcss");
-          }
-
-          fs.writeFileSync(
-            angularJsonPath,
-            JSON.stringify(angularJson, null, 2),
-            "utf-8"
-          );
-        }
-      }
-
-      // Update styles.css
-      const stylesPath = path.join(frontendDir, "src", "styles.css");
-      const cssContent = `@import "tailwindcss";
-
-/* Your custom styles here */`;
-
-      fs.writeFileSync(stylesPath, cssContent, "utf-8");
     }
 
     // Install frontend tools
@@ -876,7 +859,6 @@ const app = async () => {
         "Next.js + Tailwind",
         "Next.js TS + Tailwind",
         "Vue + Tailwind",
-        "Angular",
         "None",
       ],
     });
